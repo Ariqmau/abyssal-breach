@@ -1,0 +1,158 @@
+[gd_scene format=3 uid="uid://bn2nmkjxvor1u"]
+
+[ext_resource type="Script" uid="uid://qpmxwnrtuxf6" path="res://Scripts/3D/submarine_logic.gd" id="1_j4rqf"]
+[ext_resource type="PackedScene" uid="uid://dtjvsc6pyq1x1" path="res://Assets/models/Sub_cut.glb" id="2_75rsv"]
+[ext_resource type="PackedScene" uid="uid://dhuyu25r5b55d" path="res://Assets/models/Sub_samping.glb" id="3_10ap1"]
+[ext_resource type="PackedScene" uid="uid://bxt5u6s2d0si7" path="res://Scenes/2D/EngineerRobot.tscn" id="3_v50w2"]
+[ext_resource type="PackedScene" uid="uid://dj4sdn3x816bs" path="res://Scenes/2D/BackgroundTileMap.tscn" id="4_cvhlk"]
+[ext_resource type="Script" uid="uid://bs8kvsyeajyjn" path="res://Scripts/2D/trampoline_3d.gd" id="5_tramp"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_75rsv"]
+margin = 0.0
+radius = 1.6201172
+height = 9.900269
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_v50w2"]
+viewport_path = NodePath("SubmarineModel/Interior/BackWallViewport")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_000t5"]
+resource_local_to_scene = true
+albedo_color = Color(1, 1, 1, 0)
+albedo_texture = SubResource("ViewportTexture_v50w2")
+texture_filter = 0
+
+[sub_resource type="QuadMesh" id="QuadMesh_cvhlk"]
+material = SubResource("StandardMaterial3D_000t5")
+size = Vector2(5, 2.1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_10ap1"]
+size = Vector3(0.41589355, 0.33258057, 5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_84kqn"]
+size = Vector3(0.75598145, 1.7753906, 0.73876953)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_v50w2"]
+size = Vector3(0.4083252, 0.6791992, 3.269165)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cvhlk"]
+size = Vector3(0.43310547, 0.34960938, 0.82373047)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_000t5"]
+size = Vector3(0.42834473, 0.39526367, 0.3952942)
+
+[node name="Submarine3D" type="CharacterBody3D" unique_id=1202601811]
+collision_layer = 2
+script = ExtResource("1_j4rqf")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1911921627]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, -7.3130664e-08, 1.6730347)
+shape = SubResource("CapsuleShape3D_75rsv")
+
+[node name="CamPos_Dollhouse" type="Marker3D" parent="." unique_id=1173916575]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 6.7527, -0.086, 1.627)
+
+[node name="SubmarineModel" type="Node3D" parent="." unique_id=420263049]
+
+[node name="CamPos_Cockpit" type="Marker3D" parent="SubmarineModel" unique_id=1664411095]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, -2.030105)
+
+[node name="CamPos_Back" type="Marker3D" parent="SubmarineModel" unique_id=223938762]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0.6, 6.5984406)
+
+[node name="Sub_cut" parent="SubmarineModel" unique_id=1271659275 instance=ExtResource("2_75rsv")]
+transform = Transform3D(-0.01, 0, -8.7422775e-10, 0, 0.01, 0, 8.7422775e-10, 0, -0.01, 0, -0.8, -1.7)
+
+[node name="Sub_samping" parent="SubmarineModel" unique_id=2059329847 instance=ExtResource("3_10ap1")]
+transform = Transform3D(-0.01, 0, -8.7422775e-10, 0, 0.01, 0, 8.7422775e-10, 0, -0.01, 0, -0.8, -1.7)
+visible = false
+
+[node name="SubmarineLights" type="Node3D" parent="SubmarineModel" unique_id=1175908030]
+
+[node name="LightLeft" type="SpotLight3D" parent="SubmarineModel/SubmarineLights" unique_id=1442917844]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, -1.8)
+light_color = Color(0.8509804, 0.92156863, 1, 1)
+light_energy = 3.0
+spot_range = 35.0
+spot_angle = 40.0
+
+[node name="LightRight" type="SpotLight3D" parent="SubmarineModel/SubmarineLights" unique_id=839493841]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, -1.8)
+light_color = Color(0.8509804, 0.92156863, 1, 1)
+light_energy = 3.0
+spot_range = 35.0
+spot_angle = 40.0
+
+[node name="Interior" type="Node3D" parent="SubmarineModel" unique_id=220548115]
+
+[node name="EngineerRobot" parent="SubmarineModel/Interior" unique_id=35756405 instance=ExtResource("3_v50w2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.1516113, -0.36041015, -0.20039701)
+
+[node name="BackWall" type="MeshInstance3D" parent="SubmarineModel/Interior" unique_id=1389896424]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.423059, 0.24502814, 1.3136637)
+mesh = SubResource("QuadMesh_cvhlk")
+
+[node name="Platforms" type="Node3D" parent="SubmarineModel/Interior" unique_id=1479850542]
+
+[node name="Floor1" type="StaticBody3D" parent="SubmarineModel/Interior/Platforms" unique_id=172475926]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5292969, 0, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SubmarineModel/Interior/Platforms/Floor1" unique_id=285343890]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.11187744, -0.6199266, 1.3253384)
+shape = SubResource("BoxShape3D_10ap1")
+
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="SubmarineModel/Interior/Platforms/Floor1" unique_id=912449549]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22375488, 1.4542387, 1.2722282)
+shape = SubResource("BoxShape3D_10ap1")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="SubmarineModel/Interior/Platforms/Floor1" unique_id=2114881473]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.043840885, 0.3876953, 4.1216097)
+shape = SubResource("BoxShape3D_84kqn")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="SubmarineModel/Interior/Platforms/Floor1" unique_id=738726484]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08768177, 0.430336, -1.5278921)
+shape = SubResource("BoxShape3D_84kqn")
+
+[node name="Floor2" type="StaticBody3D" parent="SubmarineModel/Interior/Platforms" unique_id=2092529046]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5292969, 1.1817322, 0)
+collision_layer = 4
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SubmarineModel/Interior/Platforms/Floor2" unique_id=176739606]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.101257324, -0.9265137, 1.2686157)
+shape = SubResource("BoxShape3D_v50w2")
+
+[node name="DropZone" type="Area3D" parent="SubmarineModel/Interior/Platforms" unique_id=1012306067]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SubmarineModel/Interior/Platforms/DropZone" unique_id=564069208]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6327095, -0.26367188, 3.4131732)
+shape = SubResource("BoxShape3D_cvhlk")
+
+[node name="Trampoline" type="StaticBody3D" parent="SubmarineModel/Interior" unique_id=2104208579]
+script = ExtResource("5_tramp")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SubmarineModel/Interior/Trampoline" unique_id=1661323414]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.65179443, -0.26379395, -0.9846039)
+shape = SubResource("BoxShape3D_000t5")
+
+[node name="BackWallViewport" type="SubViewport" parent="SubmarineModel/Interior" unique_id=1571131963]
+transparent_bg = true
+size = Vector2i(208, 96)
+render_target_update_mode = 4
+
+[node name="BackgroundTileMap" parent="SubmarineModel/Interior/BackWallViewport" unique_id=1024160193 instance=ExtResource("4_cvhlk")]
+
+[node name="SignSlots" type="Node3D" parent="SubmarineModel/Interior" unique_id=938803214]
+
+[node name="Slot0" type="Marker3D" parent="SubmarineModel/Interior/SignSlots" unique_id=1688190457]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.52142334, -0.2768696, 2.4745255)
+
+[node name="Slot1" type="Marker3D" parent="SubmarineModel/Interior/SignSlots" unique_id=563170269]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.52142334, -0.2768696, 0.108543396)
+
+[node name="Slot2" type="Marker3D" parent="SubmarineModel/Interior/SignSlots" unique_id=1775282406]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.52142334, 0.82181567, 0.108543396)
+
+[node name="Slot3" type="Marker3D" parent="SubmarineModel/Interior/SignSlots" unique_id=403125935]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.52142334, 0.82181567, 2.5146675)

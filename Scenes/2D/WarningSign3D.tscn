@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://dw0rtrrw1bv5p"]
+
+[ext_resource type="Script" uid="uid://b46xcnpiesms4" path="res://Scripts/2D/warning_sign_3d.gd" id="0_wsgd"]
+[ext_resource type="Texture2D" uid="uid://cm14cwuxeexum" path="res://Assets/sprites/WarningSign_PixyFantasy/WarningSign01.png" id="1_h50wb"]
+[ext_resource type="Texture2D" uid="uid://4j5uelo567u2" path="res://Assets/sprites/WarningSign_PixyFantasy/WarningSign02.png" id="2_5i5g5"]
+[ext_resource type="Texture2D" uid="uid://cw8jda38g2wst" path="res://Assets/sprites/WarningSign_PixyFantasy/WarningSign03.png" id="3_5leeu"]
+[ext_resource type="Texture2D" uid="uid://bane722pxlcah" path="res://Assets/sprites/WarningSign_PixyFantasy/WarningSign04.png" id="4_a36yt"]
+[ext_resource type="Texture2D" uid="uid://dohifl3ue3moh" path="res://Assets/sprites/WarningSign_PixyFantasy/WarningSign05.png" id="5_wum8s"]
+[ext_resource type="Texture2D" uid="uid://bfu3ml84n64c0" path="res://Assets/sprites/WarningSign_PixyFantasy/WarningSign06.png" id="6_2uusp"]
+[ext_resource type="Texture2D" uid="uid://bmjb3gcwkjmbi" path="res://Assets/sprites/WarningSign_PixyFantasy/WarningSign07.png" id="7_trbyv"]
+[ext_resource type="Texture2D" uid="uid://dl2c0byemdoc4" path="res://Assets/sprites/WarningSign_PixyFantasy/WarningSign08.png" id="8_okth0"]
+[ext_resource type="Texture2D" uid="uid://vgmaa7dprota" path="res://Assets/sprites/WarningSign_PixyFantasy/WarningSign09.png" id="9_43bwj"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tt73b"]
+size = Vector3(0.5, 0.43322754, 0.43302003)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_yj5kj"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_h50wb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_5i5g5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_5leeu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_a36yt")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_wum8s")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_2uusp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_trbyv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_okth0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_43bwj")
+}],
+"loop": true,
+"name": &"damaged",
+"speed": 10.0
+}]
+
+[node name="WarningSign3d" type="Area3D" unique_id=1422462569]
+collision_layer = 0
+collision_mask = 8
+script = ExtResource("0_wsgd")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1409510941]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.00018310547, -0.0024597272)
+shape = SubResource("BoxShape3D_tt73b")
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="." unique_id=1762638297]
+transform = Transform3D(0.45, 0, 0, 0, 0.45, 0, 0, 0, 0.45, 0, 0, 0)
+pixel_size = 0.04
+billboard = 1
+texture_filter = 0
+sprite_frames = SubResource("SpriteFrames_yj5kj")
+animation = &"damaged"
+frame = 2
+frame_progress = 0.3248772

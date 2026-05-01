@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://dbywgiv4d5ro6"]
+
+[ext_resource type="Script" uid="uid://doxn6cuca637v" path="res://Scripts/main_controller.gd" id="1_kln2b"]
+[ext_resource type="PackedScene" uid="uid://bn2nmkjxvor1u" path="res://Scenes/3D/Submarine3D.tscn" id="2_rgh2o"]
+[ext_resource type="Script" uid="uid://b7fbu6unqrn8g" path="res://Scripts/3D/leviathan.gd" id="3_rgh2o"]
+[ext_resource type="PackedScene" uid="uid://c7e4kp5r6ljsa" path="res://Assets/models/ghost_leviathan.glb" id="4_50glp"]
+[ext_resource type="Script" uid="uid://3r7g1bh201gf" path="res://Scripts/3D/cave_spawner.gd" id="4_pbw6q"]
+[ext_resource type="Script" uid="uid://bc5rk5bdv2104" path="res://Scripts/UI/hud.gd" id="5_pbw6q"]
+
+[sub_resource type="Environment" id="Environment_kln2b"]
+background_mode = 1
+background_color = Color(0.039215688, 0.101960786, 0.18039216, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.101960786, 0.22745098, 0.36078432, 1)
+ambient_light_energy = 0.3
+glow_enabled = true
+fog_enabled = true
+fog_light_color = Color(0.050980393, 0.13333334, 0.2, 1)
+fog_density = 0.02
+
+[node name="Main" type="Node3D" unique_id=93826978]
+script = ExtResource("1_kln2b")
+win_distance = 5000.0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1795757042]
+environment = SubResource("Environment_kln2b")
+
+[node name="MainCamera" type="Camera3D" parent="." unique_id=1310587184]
+
+[node name="Submarine3D" parent="." unique_id=1202601811 instance=ExtResource("2_rgh2o")]
+
+[node name="Leviathan" type="Node3D" parent="." unique_id=2082644622 node_paths=PackedStringArray("submarine")]
+script = ExtResource("3_rgh2o")
+submarine = NodePath("../Submarine3D")
+lunge_trigger_dist = 7.0
+lunge_cooldown = 8.0
+model_scene = ExtResource("4_50glp")
+model_scale = 40.0
+model_rotation_deg = Vector3(0, 180, 0)
+
+[node name="CaveSpawner" type="Node3D" parent="." unique_id=501452079 node_paths=PackedStringArray("submarine")]
+script = ExtResource("4_pbw6q")
+submarine = NodePath("../Submarine3D")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1151026563]
+
+[node name="Node" type="Node" parent="CanvasLayer" unique_id=743420883]
+script = ExtResource("5_pbw6q")
