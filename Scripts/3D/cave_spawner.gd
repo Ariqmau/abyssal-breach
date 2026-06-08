@@ -21,7 +21,7 @@ extends Node3D
 @export var tube_sides         : int   = 20
 
 ## Thickness of the outer wall shell (visible in 2D dollhouse mode).
-@export var wall_thickness     : float = 5.0
+@export var wall_thickness     : float = 18.0
 
 ## Max random shift of the cave centre per segment — creates winding.
 @export var meander_x          : float = 0.8
@@ -472,6 +472,7 @@ func _build_materials() -> void:
 	_outer_mat.albedo_color = Color(0.18, 0.15, 0.11)
 	_outer_mat.roughness    = 1.0
 	_outer_mat.metallic     = 0.0
+	_outer_mat.cull_mode    = BaseMaterial3D.CULL_DISABLED
 
 	_stala_mat              = StandardMaterial3D.new()
 	_stala_mat.albedo_color = Color(0.28, 0.24, 0.18)

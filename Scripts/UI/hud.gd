@@ -12,13 +12,32 @@ const _BAR_W   : float = 180.0
 const _BAR_H   : float = 14.0
 const _PANEL_W : float = 200.0
 
-const _C_FULL := Color(0.20, 0.90, 0.40)
-const _C_LOW  := Color(0.95, 0.25, 0.10)
-const _C_TEXT := Color(0.80, 0.95, 1.00)
-const _C_DIM  := Color(0.45, 0.65, 0.75)
-const _C_BG   := Color(0.00, 0.04, 0.10, 0.85)
-const _C_DIST := Color(0.20, 0.65, 0.95)
-const _C_WIN  := Color(0.20, 0.90, 0.60)
+const _C_FULL  := Color(0.20, 0.90, 0.40)
+const _C_LOW   := Color(0.95, 0.25, 0.10)
+const _C_TEXT  := Color(0.80, 0.95, 1.00)
+const _C_DIM   := Color(0.45, 0.65, 0.75)
+const _C_BG    := Color(0.00, 0.04, 0.10, 0.85)
+const _C_DIST  := Color(0.20, 0.65, 0.95)
+const _C_WIN   := Color(0.20, 0.90, 0.60)
+const _C_BOOST := Color(0.00, 0.85, 1.00)
+const _C_WARN  := Color(1.00, 0.85, 0.10)
+
+
+# ══════════════════════════════════════════════════════
+#  VIGNETTE SHADER  (shared by flash & boost overlays)
+# ══════════════════════════════════════════════════════
+
+const _VIGNETTE_GLSL : String = """
+shader_type canvas_item;
+uniform vec4 vignette_color : source_color = vec4(0.0, 0.0, 0.0, 0.0);
+void fragment() {
+	vec2  uv = UV - vec2(0.5);
+	float bx = smoothstep(0.38, 0.50, abs(uv.x));
+	float by = smoothstep(0.38, 0.50, abs(uv.y));
+	float a  = max(bx, by) * vignette_color.a;
+	COLOR    = vec4(vignette_color.rgb, a);
+}
+"""
 
 
 # ══════════════════════════════════════════════════════
@@ -43,7 +62,14 @@ var _hi_lbl    : Label
 var _dist_fill : ColorRect
 var _dist_lbl  : Label
 
-var _overlay   : Control = null
+var _boost_overlay : ColorRect = null  # persistent cyan edge glow while boosting
+var _flash_overlay : ColorRect = null  # transient red/green flash on damage/repair
+var _boost_label   : Label     = null  # "⚡ +X.X SPD · Xs" below panel
+var _lev_hint      : Label     = null  # leviathan outrun warning
+
+var _overlay : Control = null
+
+var _vignette_shader : Shader = null
 
 
 # ══════════════════════════════════════════════════════
@@ -52,6 +78,7 @@ var _overlay   : Control = null
 
 var _paused         : bool = false
 var _result_showing : bool = false
+var _prev_hp        : int  = -1
 
 
 # ══════════════════════════════════════════════════════
@@ -73,6 +100,8 @@ func _ready() -> void:
 	Globals.hull_integrity_changed.connect(_on_hull_changed)
 	Globals.ship_destroyed.connect(_on_ship_destroyed)
 	Globals.game_won.connect(_on_game_won)
+	Globals.damage_taken.connect(_on_damage_taken)
+	Globals.boost_changed.connect(_on_boost_changed)
 
 
 func _input(event: InputEvent) -> void:
@@ -91,16 +120,31 @@ func _process(_delta: float) -> void:
 	_dist_fill.size.x  = _BAR_W * prog
 	_dist_lbl.text     = "DIST  %d%%" % int(prog * 100.0)
 
+	if _boost_label.visible:
+		_boost_label.text = "⚡ +%.0f SPD  %.1fs" % [Globals.boost_amount, maxf(Globals.boost_timer, 0.0)]
+
+	_update_lev_hint()
+
 
 # ══════════════════════════════════════════════════════
 #  SIGNAL HANDLERS
 # ══════════════════════════════════════════════════════
 
 func _on_hull_changed(hp: int) -> void:
-	var ratio        := float(hp) / float(Globals.max_hull_integrity)
-	_hp_fill.size.x   = _BAR_W * ratio
-	_hp_fill.color    = _C_FULL.lerp(_C_LOW, 1.0 - ratio)
-	_hp_label.text    = "HULL  %d / %d" % [hp, Globals.max_hull_integrity]
+	var ratio      := float(hp) / float(Globals.max_hull_integrity)
+	_hp_fill.color  = _C_FULL.lerp(_C_LOW, 1.0 - ratio)
+	_hp_label.text  = "HULL  %d / %d" % [hp, Globals.max_hull_integrity]
+
+	var tw := create_tween().set_ease(Tween.EASE_OUT)
+	tw.tween_property(_hp_fill, "size:x", _BAR_W * ratio, 0.25)
+
+	if _prev_hp >= 0:
+		if hp > _prev_hp:
+			_flash_screen(Color(0.10, 0.90, 0.40, 0.15))
+			_show_hud_popup("+ HULL REPAIRED", _C_WIN)
+		elif hp < _prev_hp and hp > 0:
+			_flash_screen(Color(0.90, 0.10, 0.10, 0.20))
+	_prev_hp = hp
 
 
 func _on_ship_destroyed() -> void:
@@ -119,6 +163,37 @@ func _on_game_won() -> void:
 		"SCORE  %d\nBEST   %d" % [Globals.score, Globals.high_score],
 		_C_WIN, true
 	)
+
+
+func _on_damage_taken(source: String) -> void:
+	var msg : String
+	match source:
+		"stalactite": msg = "⚠  STALACTITE STRIKE"
+		"wall":       msg = "⚠  WALL COLLISION"
+		"leviathan":  msg = "⚠  LEVIATHAN BITE"
+		_:            msg = "⚠  HULL BREACH"
+	_show_hud_popup(msg, _C_LOW)
+
+
+func _on_boost_changed(active: bool, _amount: float) -> void:
+	_boost_label.visible = active
+	_spd_label.add_theme_color_override("font_color", _C_BOOST if active else _C_DIM)
+	if active:
+		_flash_screen(Color(0.0, 0.85, 1.0, 0.18))
+
+
+# ══════════════════════════════════════════════════════
+#  LEVIATHAN HINT
+# ══════════════════════════════════════════════════════
+
+func _update_lev_hint() -> void:
+	if _result_showing or Globals.hull_integrity <= 0:
+		_lev_hint.visible = false
+		return
+	var lev  = get_tree().get_first_node_in_group("leviathan")
+	var hunting  : bool = lev != null and lev.has_method("is_actively_hunting") and lev.is_actively_hunting()
+	var damaged  : bool = Globals.hull_integrity < Globals.max_hull_integrity
+	_lev_hint.visible = hunting and damaged
 
 
 # ══════════════════════════════════════════════════════
@@ -207,6 +282,22 @@ func _build_hud() -> void:
 	_dist_fill.position = Vector2(14.0, 110.0)
 	_root.add_child(_dist_fill)
 
+	# Boost label — appears below panel when crystal boost is active
+	_boost_label = _make_hud_label("", Vector2(14.0, 136.0), 10, _C_BOOST)
+	_boost_label.visible = false
+
+	# Leviathan proximity hint
+	_lev_hint = _make_hud_label("▲ REPAIR HULL TO OUTRUN LEVIATHAN", Vector2(10.0, 152.0), 10, _C_WARN)
+	_lev_hint.visible = false
+
+	# Boost vignette overlay (persistent cyan edge glow, below flash)
+	_boost_overlay = _make_vignette_overlay(Color(0.0, 0.85, 1.0, 0.0))
+	_root.add_child(_boost_overlay)
+
+	# Flash vignette overlay (transient damage/repair, on top)
+	_flash_overlay = _make_vignette_overlay(Color(0.0, 0.0, 0.0, 0.0))
+	_root.add_child(_flash_overlay)
+
 	# Force-sync hull bar to current Globals state
 	_on_hull_changed(Globals.hull_integrity)
 
@@ -270,6 +361,51 @@ func _show_result(title: String, body: String, col: Color, _won: bool) -> void:
 		get_tree().change_scene_to_file("res://Scenes/UI/MainMenu.tscn")
 	)
 	_overlay = ov
+
+
+# ══════════════════════════════════════════════════════
+#  VIGNETTE HELPERS
+# ══════════════════════════════════════════════════════
+
+func _make_vignette_overlay(starting_color: Color) -> ColorRect:
+	if _vignette_shader == null:
+		_vignette_shader      = Shader.new()
+		_vignette_shader.code = _VIGNETTE_GLSL
+	var mat := ShaderMaterial.new()
+	mat.shader = _vignette_shader
+	mat.set_shader_parameter("vignette_color", starting_color)
+	var cr := ColorRect.new()
+	cr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cr.set_anchors_preset(Control.PRESET_FULL_RECT)
+	cr.material = mat
+	return cr
+
+
+func _flash_screen(col: Color) -> void:
+	var mat := _flash_overlay.material as ShaderMaterial
+	if mat == null:
+		return
+	mat.set_shader_parameter("vignette_color", col)
+	var tw := create_tween().set_ease(Tween.EASE_IN)
+	tw.tween_method(
+		func(a: float): mat.set_shader_parameter("vignette_color", Color(col.r, col.g, col.b, a)),
+		col.a, 0.0, 0.5
+	)
+
+
+func _show_hud_popup(msg: String, col: Color) -> void:
+	var lbl := Label.new()
+	lbl.text     = msg
+	lbl.position = Vector2(14.0, 9.0)
+	lbl.add_theme_font_size_override("font_size", 11)
+	lbl.add_theme_color_override("font_color", col)
+	if _fnt_mono:
+		lbl.add_theme_font_override("font", _fnt_mono)
+	_root.add_child(lbl)
+	var tw := create_tween()
+	tw.parallel().tween_property(lbl, "position:y", -2.0, 0.85).set_ease(Tween.EASE_OUT)
+	tw.parallel().tween_property(lbl, "modulate:a", 0.0, 0.85).set_delay(0.25)
+	tw.tween_callback(lbl.queue_free)
 
 
 # ══════════════════════════════════════════════════════

@@ -47,6 +47,7 @@ func _ready() -> void:
 	_lev_lunge   = _mk("res://Assets/audio/leviathan-lunge.mp3")
 	_lev_lunge.volume_db = -6.0
 	_footstep    = _mk("res://Assets/audio/robot-footstep.mp3")
+	_footstep.volume_db = -12.0
 	_robot_fix   = _mk("res://Assets/audio/robot-fix.mp3")
 	_mode_switch = _mk("res://Assets/audio/3d-2dmode-switch.mp3")
 	_win         = _mk("res://Assets/audio/win_sound.mp3")

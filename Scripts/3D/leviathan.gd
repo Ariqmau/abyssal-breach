@@ -268,6 +268,10 @@ func _build_body() -> void:
 #  HELPERS
 # ══════════════════════════════════════════════════════
 
+func is_actively_hunting() -> bool:
+	return _phase == Phase.CHASE
+
+
 func _find_any_character_body() -> void:
 	_search_node(get_tree().root)
 

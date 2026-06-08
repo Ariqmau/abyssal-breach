@@ -75,9 +75,11 @@ func _build() -> void:
 
 	# Subtitle
 	vbox.add_child(_label("Navigate the depths  ·  Survive the dark", 14, _C_DIM, _fnt_bold, true))
+	vbox.add_child(_spacer(4))
+	vbox.add_child(_label("✦ Collect as many glowing crystals as you can", 11, _C_ACCENT, _fnt_mono, true))
 
 	# Spacer
-	vbox.add_child(_spacer(28))
+	vbox.add_child(_spacer(24))
 
 	# Highscore
 	var hi_box := HBoxContainer.new()

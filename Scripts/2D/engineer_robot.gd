@@ -65,6 +65,8 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	if not Globals.is_in_2d_mode:
 		return
+	if Globals.hull_integrity <= 0:
+		return
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		_handle_click(event.position)
 		get_viewport().set_input_as_handled()
@@ -208,6 +210,9 @@ func _physics_process(delta: float) -> void:
 				_current_sign      = null
 				_is_fixing         = false
 				_trampoline_target = false
+				var tramp := col.get_collider()
+				if tramp.has_method("bounce"):
+					tramp.bounce()
 			break
 
 	# Lock X to floor depth; clamp Z inside interior bounds.
@@ -234,6 +239,9 @@ func _on_arrived() -> void:
 		_vel_v        = jump_force * _LAUNCH_MULT
 		_target_local = Vector3(interior_x_depth, 0.7, 1.32)
 		_has_target   = true
+		var tramp := get_tree().get_first_node_in_group("trampoline")
+		if tramp != null and tramp.has_method("bounce"):
+			tramp.bounce()
 		return
 	if _current_sign != null and is_instance_valid(_current_sign):
 		_is_fixing = true

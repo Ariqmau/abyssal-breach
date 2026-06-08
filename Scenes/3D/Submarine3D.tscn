@@ -12,13 +12,13 @@ margin = 0.0
 radius = 1.6201172
 height = 9.900269
 
-[sub_resource type="ViewportTexture" id="ViewportTexture_v50w2"]
+[sub_resource type="ViewportTexture" id="ViewportTexture_10ap1"]
 viewport_path = NodePath("SubmarineModel/Interior/BackWallViewport")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_000t5"]
 resource_local_to_scene = true
 albedo_color = Color(1, 1, 1, 0)
-albedo_texture = SubResource("ViewportTexture_v50w2")
+albedo_texture = SubResource("ViewportTexture_10ap1")
 texture_filter = 0
 
 [sub_resource type="QuadMesh" id="QuadMesh_cvhlk"]
@@ -29,10 +29,10 @@ size = Vector2(5, 2.1)
 size = Vector3(0.41589355, 0.33258057, 5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_84kqn"]
-size = Vector3(0.75598145, 1.7753906, 0.73876953)
+size = Vector3(1.3527222, 1.7753906, 0.93981934)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_v50w2"]
-size = Vector3(0.4083252, 0.6791992, 3.269165)
+size = Vector3(0.4083252, 0.6791992, 3.1989136)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cvhlk"]
 size = Vector3(0.43310547, 0.34960938, 0.82373047)
@@ -107,7 +107,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22375488, 1.4542387, 1.2722
 shape = SubResource("BoxShape3D_10ap1")
 
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="SubmarineModel/Interior/Platforms/Floor1" unique_id=2114881473]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.043840885, 0.3876953, 4.1216097)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.34221125, 0.3876953, 4.021085)
 shape = SubResource("BoxShape3D_84kqn")
 
 [node name="CollisionShape3D3" type="CollisionShape3D" parent="SubmarineModel/Interior/Platforms/Floor1" unique_id=738726484]
@@ -120,7 +120,7 @@ collision_layer = 4
 collision_mask = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="SubmarineModel/Interior/Platforms/Floor2" unique_id=176739606]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.101257324, -0.9265137, 1.2686157)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.101257324, -0.9265137, 1.23349)
 shape = SubResource("BoxShape3D_v50w2")
 
 [node name="DropZone" type="Area3D" parent="SubmarineModel/Interior/Platforms" unique_id=1012306067]
@@ -131,6 +131,9 @@ shape = SubResource("BoxShape3D_cvhlk")
 
 [node name="Trampoline" type="StaticBody3D" parent="SubmarineModel/Interior" unique_id=2104208579]
 script = ExtResource("5_tramp")
+atlas_compressed = Vector2i(5, 8)
+atlas_extended = Vector2i(4, 8)
+trampoline_cell = Vector2i(12, 4)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="SubmarineModel/Interior/Trampoline" unique_id=1661323414]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.65179443, -0.26379395, -0.9846039)

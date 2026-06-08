@@ -24,4 +24,8 @@ func apply_fix() -> void:
 	_fix_count += 1
 	if _fix_count >= _FIXES_NEEDED:
 		Globals.repair_level()
-		queue_free()
+		collision_layer = 0  # prevent re-click during exit animation
+		var tw := create_tween()
+		tw.parallel().tween_property(_sprite, "scale", Vector3(1.5, 1.5, 1.5), 0.12).set_ease(Tween.EASE_OUT)
+		tw.parallel().tween_property(_sprite, "modulate", Color(0.3, 1.0, 0.5, 0.0), 0.22).set_ease(Tween.EASE_IN)
+		tw.tween_callback(queue_free)
